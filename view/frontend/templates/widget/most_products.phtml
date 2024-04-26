@@ -1,0 +1,156 @@
+<?php
+
+/**
+ *
+ * @category  Custom Development
+ * @email     contactus@learningmagento.com
+ * @author    Learning Magento
+ * @website   learningmagento.com
+ * @Date      19-04-2024
+ */
+
+
+
+use Magento\Framework\App\Action\Action;
+$_productCollection = $block->getLoadedProductCollection();
+if ($_productCollection->getSize() <= 0) {
+return;
+}
+?>
+<h2><center><?php echo $block->getData("title"); ?></center></h2>
+<div class="container-">
+    <?php $_helper = $this->helper('Magento\Catalog\Helper\Output'); ?>
+    <?php
+    $viewMode = 'grid';
+    $image = 'category_page_grid';
+    $showDescription = false;
+    $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+    $pos = $block->getPositioned();
+    $position = '';
+    $formKey = $block->getFormKey();
+    ?>
+    <style>
+        .products-grid .product-item-inner{
+            margin:unset;
+        }
+    </style>
+    <?php $count = 1; ?>
+    <div class="ind-container">
+        <div class=" products wrapper grid products-grid <?php /* @escapeNotVerified */ echo $viewMode; ?> products-<?php /* @escapeNotVerified */ echo $viewMode; ?>">
+            <?php $iterator = 1; ?>
+            <div class="products grid items product-items slick-carousel" >
+                <?php $prdCount = 0; ?>
+                <?php foreach($_productCollection as $_product):
+
+                    ?>
+                    <?php //$_product = $block->getLoadProduct($_product->getEntityId()); ?>
+                    <div class="item product product-item">
+                        <div class="product-item-info item" data-container="product-grid">
+                            <?php
+                            $productImage = $block->getImage($_product, $image);
+                            if ($pos != null) {
+                                $position = ' style="left:' . $productImage->getWidth() . 'px;'
+                                    . 'top:' . $productImage->getHeight() . 'px;"';
+                            }
+                            ?>
+                            <?php // Product Image ?>
+                            <a href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl() ?>" class="product photo product-item-photo" tabindex="-1">
+                                <?php /* @escapeNotVerified */ echo $productImage->toHtml(); ?>
+                                <div class="product-discount">
+                                    <?php $originalPrice = $_product->getPrice();
+                                    $finalPrice = $_product->getFinalPrice();
+                                    $discount = 0;
+                                    if($originalPrice > $finalPrice){
+                                        $discount = number_format(($originalPrice - $finalPrice) * 100 / $originalPrice,0);
+                                        ?>
+                                        <div class="price_section">
+                                            <span class=""><?= $discount.'% Off'; ?></span>
+                                        </div>
+                                    <?php } ?>
+                                    <a href="#"
+                                       class="action towishlist"
+                                       title="<?php echo $block->escapeHtml(__('Add to Wishlist')); ?>"
+                                       aria-label="<?php echo $block->escapeHtml(__('Add to Wishlist')); ?>"
+                                       data-post='<?php /* @escapeNotVerified */ echo $block->getAddToWishlistParams($_product); ?>'
+                                       data-action="add-to-wishlist"
+                                       role="button">
+                                        <span><?php /* @escapeNotVerified */ echo __('Add to Wishlist') ?></span>
+                                    </a>
+                                </div>
+                            </a>
+                            <div class="product details product-item-details">
+                                <?php $_productNameStripped = $block->stripTags($_product->getName(), null, true); ?>
+                                <strong class="product name product-item-name">
+                                    <a class="product-item-link"
+                                       href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl() ?>">
+                                        <?php /* @escapeNotVerified */ echo $_helper->productAttribute($_product, $_product->getName(), 'name'); ?>
+                                    </a>
+                                </strong>
+                                <?php /* @escapeNotVerified */ echo $block->getProductPrice($_product);?>
+                                <?php /* @escapeNotVerified */ echo $block->getReviewsSummaryHtml($_product, $templateType); ?>
+
+                                <div class="product-item-inner">
+                                    <div class="product actions product-item-actions"<?php /* @escapeNotVerified */ echo $position; ?>>
+                                        <div class="actions-primary"<?php /* @escapeNotVerified */ echo $position ; ?>>
+                                            <?php if ($_product->isSaleable()): ?>
+                                                <?php $postParams = $block->getAddToCartPostParams($_product); ?>
+                                                <form data-role="tocart-form"
+                                                      data-product-sku="<?= $escaper->escapeHtml($_product->getSku()) ?>"
+                                                      action="<?= $escaper->escapeUrl($postParams['action']) ?>"
+                                                      method="post"
+                                                >
+                                                    <input type="hidden"
+                                                           name="product"
+                                                           value="<?= /* @noEscape */ $postParams['data']['product'] ?>">
+                                                    <input type="hidden"
+                                                           name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED ?>"
+                                                           value="<?=
+                                                           /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]
+                                                           ?>">
+                                                    <input type="hidden" name="form_key" value="<?= /* @noEscape */ $formKey ?>">
+
+                                                    <button type="submit"
+                                                            title="<?php echo $block->escapeHtml(__('Add to Cart')); ?>"
+                                                            class="action tocart primary">
+                                                        <span><?php /* @escapeNotVerified */ echo __('Add to Cart') ?></span>
+                                                    </button>
+                                                </form>
+                                            <?php else: ?>
+                                                <?php if ($_product->getIsSalable()): ?>
+                                                    <div class="stock available"><span><?php /* @escapeNotVerified */ echo __('In stock') ?></span></div>
+                                                <?php else: ?>
+                                                    <div class="stock unavailable"><span><?php /* @escapeNotVerified */ echo __('Out of stock') ?></span></div>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <script type="text/x-magento-init">
+                        {
+                            "[data-role=tocart-form], .form.map.checkout": {
+                                "catalogAddToCart": {
+                                    "product_sku": "<?= /* @noEscape */ $_product->getSku() ?>"
+                                }
+                            }
+                        }
+                        </script>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+    <?php $count++; ?>
+    <script>
+        require(['jquery', 'jquery/ui', 'slick'], function($) {
+            $(document).ready(function() {
+                $(".slick-carousel").slick({
+                    dots: true,
+                    infinite: false,
+                    slidesToShow: 4,
+                    slidesToScroll: 4
+                });
+            });
+        });
+    </script>

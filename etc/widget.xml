@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget class="Learningmagento\Customwidget\Block\Widget\MostProducts" id="learningmagento_develop_clock">
+        <label>Most Products Widget</label>
+        <description>
+            This widget will give the admin user to select different types of products to be listed base on ordered like recently added, most viewed and most ordered.
+        </description>
+        <parameters>
+            <parameter name="title" sort_order="10" visible="true" xsi:type="text">
+                <label translate="true">Title</label>
+            </parameter>
+            <parameter name="number_of_products" sort_order="20" visible="true" xsi:type="text">
+                <label translate="true">No. of Products</label>
+            </parameter>
+            <parameter name="list_type" sort_order="30" visible="true" source_model="Learningmagento\Customwidget\Model\Config\Source\ProductType" xsi:type="select">
+                <label translate="true">Product Type</label>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>
